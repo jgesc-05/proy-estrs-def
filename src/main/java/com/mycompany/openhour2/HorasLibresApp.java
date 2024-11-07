@@ -40,6 +40,7 @@ public class HorasLibresApp {
 
         mainPanel.add(crearPanelLogin(), "login");
         mainPanel.add(crearPanelPrincipal(), "principal");
+        mainPanel.add(crearPanelCrudHoras(), "crudHoras");
 
         frame.add(mainPanel);
         frame.setVisible(true);
@@ -99,6 +100,7 @@ public class HorasLibresApp {
                     horasLibres = new HorasLibres(); // Reiniciar horas libres
                     JOptionPane.showMessageDialog(null, "Login exitoso");
                     cardLayout.show(mainPanel, "principal");
+                    agregarMenuNavegacion();
                 } else {
                     JOptionPane.showMessageDialog(null, "Usuario o contraseña incorrectos");
                 }
@@ -142,33 +144,63 @@ public class HorasLibresApp {
 
         return panel;
     }
+    
+    private void agregarMenuNavegacion() {
+        JMenuBar menuBar = new JMenuBar();
+
+        JMenu inicioMenu = new JMenu("Usuario");
+        JMenuItem verPerfilItem = new JMenuItem("Ver Información de Usuario");
+        verPerfilItem.addActionListener(e -> mostrarInformacionUsuario());
+        inicioMenu.add(verPerfilItem);
+
+        JMenu configuracionMenu = new JMenu("Ajustes");
+        JMenuItem cambiarTemaItem = new JMenuItem("Cambiar Tema");
+        JMenuItem modificarPerfilItem = new JMenuItem("Editar perfil");
+        cambiarTemaItem.addActionListener(e -> toggleTheme());
+        configuracionMenu.add(cambiarTemaItem);
+        configuracionMenu.add(modificarPerfilItem);
+
+        JMenu horasLibresMenu = new JMenu("Horas Libres");
+        JMenuItem crudHorasItem = new JMenuItem("Modificar horas");
+        JMenuItem consultarProgreso = new JMenuItem("Consultar progreso");
+        JMenuItem verPromedio = new JMenuItem("Ver promedio");
+        crudHorasItem.addActionListener(e -> cardLayout.show(mainPanel, "crudHoras"));
+        horasLibresMenu.add(crudHorasItem);
+        horasLibresMenu.add(consultarProgreso);
+        horasLibresMenu.add(verPromedio);
+        
+        JMenu eventosMenu = new JMenu("Eventos");
+        
+        JMenu correosMenu = new JMenu("Correos/recom");
+        JMenuItem correosSugerenciasItem = new JMenuItem("Enviar correo");
+        JMenuItem recomendacionesHorasItem = new JMenuItem("Recomendaciones");
+        correosMenu.add(correosSugerenciasItem);
+        correosMenu.add(recomendacionesHorasItem);
+ 
+
+        menuBar.add(inicioMenu);
+        menuBar.add(horasLibresMenu);
+        menuBar.add(eventosMenu);
+        menuBar.add(correosMenu);
+        menuBar.add(configuracionMenu);
+
+
+        frame.setJMenuBar(menuBar);
+    }
+    
+        private void mostrarInformacionUsuario() {
+        String perfil = "Nombre: " + usuarioActual.getNombre() + "\nID: " + usuarioActual.getId() +
+                        "\nSemestre: " + usuarioActual.getSemestre() + "\nNivel: " + usuarioActual.getNivel() +
+                        "\nHoras Libres Totales: " + usuarioActual.getHorasLibresTotales();
+        JOptionPane.showMessageDialog(null, perfil, "Perfil de Usuario", JOptionPane.INFORMATION_MESSAGE);
+    }
+
 
     private JPanel crearPanelPrincipal() {
         JPanel panel = new JPanel();
         panel.setLayout(null);
         
-        JButton toggleThemeButton = new JButton("Cambiar Tema");
-        toggleThemeButton.setBounds(380,8,110, 18);
-        panel.add(toggleThemeButton);
-
-        toggleThemeButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                toggleTheme();
-            }
-        });
         
-        JButton logoutButton = new JButton("Cerrar Sesión");
-        logoutButton.setBounds(10, 340, 150, 25);
-        panel.add(logoutButton);
-
-        logoutButton.addActionListener(new ActionListener() {
-            @Override
-         public void actionPerformed(ActionEvent e) {
-            usuarioActual = null; // Limpiar el usuario actual
-            cardLayout.show(mainPanel, "login");
-        }
-    });
 
         JLabel horasLabel = new JLabel("Horas Libres:");
         horasLabel.setBounds(10, 20, 80, 25);
@@ -343,9 +375,149 @@ actualizarHorasButton.addActionListener(new ActionListener() {
                 JOptionPane.showMessageDialog(null, perfil);
             }
         });
+        
+  
 
         return panel;
     }
+    
+private JPanel crearPanelCrudHoras() {
+    JPanel panel = new JPanel();
+    panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));  // Usamos BoxLayout en columna
+
+    // Título
+    JLabel label = new JLabel("Modificar horas libres");
+    label.setAlignmentX(Component.CENTER_ALIGNMENT);  // Centrar el título
+    panel.add(label);
+
+    // Espaciado entre componentes
+    panel.add(Box.createVerticalStrut(10));
+
+    // Etiqueta de horas
+    JLabel horasLabel = new JLabel("Horas:");
+    horasLabel.setAlignmentX(Component.CENTER_ALIGNMENT);  // Centrar la etiqueta
+    panel.add(horasLabel);
+
+    // Cuadro de texto para ingresar las horas
+    JTextField horasText = new JTextField(20);
+    horasText.setMaximumSize(new Dimension(200, 25));  // Limitar el tamaño del cuadro de texto
+    horasText.setPreferredSize(new Dimension(200, 25));  // Tamaño preferido
+    horasText.setAlignmentX(Component.CENTER_ALIGNMENT);  // Centrar el cuadro de texto
+    panel.add(horasText);
+
+    // Espaciado entre componentes
+    panel.add(Box.createVerticalStrut(10));
+
+    // Botones de acciones
+    JButton agregarButton = new JButton("Agregar Horas");
+    agregarButton.setAlignmentX(Component.CENTER_ALIGNMENT);  // Centrar el botón
+    panel.add(agregarButton);
+    agregarButton.addActionListener(new ActionListener() {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            try {
+                int horas = Integer.parseInt(horasText.getText());
+                if (horas < 0) {
+                    JOptionPane.showMessageDialog(null, "Por favor, ingrese un número válido de horas");
+                    return;
+                }
+                horasLibres.agregarHoras(horas);
+                usuarioActual.setHorasLibresTotales(usuarioActual.getHorasLibresTotales() + horas);
+                guardarUsuarioActual();
+                JOptionPane.showMessageDialog(null, "Horas agregadas");
+            } catch (NumberFormatException ex) {
+                JOptionPane.showMessageDialog(null, "Por favor, ingrese un número válido de horas");
+            }
+        }
+
+        private void guardarUsuarioActual() {
+            try {
+                sistema.guardarSistema("sistema.dat");
+            } catch (IOException ex) {
+                ex.printStackTrace();
+                JOptionPane.showMessageDialog(null, "Error al guardar los datos del usuario");
+            }
+        }
+    });
+
+    // Espaciado entre botones
+    panel.add(Box.createVerticalStrut(10));
+
+    JButton eliminarButton = new JButton("Eliminar Horas");
+    eliminarButton.setAlignmentX(Component.CENTER_ALIGNMENT);  // Centrar el botón
+    panel.add(eliminarButton);
+    eliminarButton.addActionListener(new ActionListener() {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            try {
+                    int horas = Integer.parseInt(horasText.getText());
+                    if (horas < 0 || horas > usuarioActual.getHorasLibresTotales()) {
+                        JOptionPane.showMessageDialog(null, "Por favor, ingrese un número válido de horas");
+                        return;
+                    }
+                    horasLibres.eliminarHoras(horas);
+                    usuarioActual.setHorasLibresTotales(usuarioActual.getHorasLibresTotales() - horas);
+                    guardarUsuarioActual();
+                    JOptionPane.showMessageDialog(null, "Horas eliminadas");
+                } catch (NumberFormatException ex) {
+                    JOptionPane.showMessageDialog(null, "Por favor, ingrese un número válido de horas");
+                }
+            }
+        private void guardarUsuarioActual() {
+            try {
+                sistema.guardarSistema("sistema.dat");
+            } catch (IOException ex) {
+                ex.printStackTrace();
+                JOptionPane.showMessageDialog(null, "Error al guardar los datos del usuario");
+            }
+        }
+    });
+
+    JButton actualizarButton = new JButton("Actualizar Horas");
+    actualizarButton.setAlignmentX(Component.CENTER_ALIGNMENT);  // Centrar el botón
+    panel.add(actualizarButton);
+    actualizarButton.addActionListener(new ActionListener() {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            try {
+            int horas = Integer.parseInt(horasText.getText());
+            if (horas < 0) {
+                JOptionPane.showMessageDialog(null, "Por favor, ingrese un número válido de horas");
+                return;
+            }
+            usuarioActual.setHorasLibresTotales(horas);
+            guardarUsuarioActual();
+            JOptionPane.showMessageDialog(null, "Horas actualizadas");
+        } catch (NumberFormatException ex) {
+            JOptionPane.showMessageDialog(null, "Por favor, ingrese un número válido de horas");
+        }
+        }
+         private void guardarUsuarioActual() {
+            try {
+                sistema.guardarSistema("sistema.dat");
+            } catch (IOException ex) {
+                ex.printStackTrace();
+                JOptionPane.showMessageDialog(null, "Error al guardar los datos del usuario");
+            }
+        }
+    });
+
+    JButton consultarButton = new JButton("Consultar Horas");
+    consultarButton.setAlignmentX(Component.CENTER_ALIGNMENT);  // Centrar el botón
+    panel.add(consultarButton);
+    consultarButton.addActionListener(new ActionListener() {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+                    String horas = "Horas que llevas: " + usuarioActual.getHorasLibresTotales();
+        JOptionPane.showMessageDialog(null, horas, "Horas que llevas", JOptionPane.INFORMATION_MESSAGE);
+        }
+    });
+
+    return panel;
+}
+
+    
+    
     
      private void toggleTheme() {
         if (isDarkMode) {
