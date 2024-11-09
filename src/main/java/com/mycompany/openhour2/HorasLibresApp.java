@@ -30,7 +30,7 @@ public class HorasLibresApp {
     }
 
     private void crearInterfaz() {
-        frame = new JFrame("Gestión de Horas Libres");
+        frame = new JFrame("OpenHour");
         frame.setSize(650, 500);
         frame.setLocationRelativeTo(null);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
