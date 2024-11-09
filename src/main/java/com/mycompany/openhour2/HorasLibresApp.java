@@ -159,7 +159,7 @@ public class HorasLibresApp {
         cambiarTemaItem.addActionListener(e -> toggleTheme());
         configuracionMenu.add(cambiarTemaItem);
         configuracionMenu.add(modificarPerfilItem);
-
+        
         JMenu horasLibresMenu = new JMenu("Horas Libres");
         JMenuItem crudHorasItem = new JMenuItem("Modificar horas");
         JMenuItem consultarProgreso = new JMenuItem("Consultar progreso");
