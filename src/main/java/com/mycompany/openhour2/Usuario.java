@@ -11,6 +11,7 @@ import java.io.*;
     private String contrasena;
     private int semestre;
     private int nivel;
+    private String correo;
     private int horasLibresTotales;
     private int horasLibresParaGraduarse = 96;
 
@@ -71,6 +72,8 @@ import java.io.*;
     public void setNivel(int nivel) {
         this.nivel = nivel;
     }
+    
+
 
     public int getHorasLibresTotales() {
         return horasLibresTotales;
@@ -90,3 +93,4 @@ import java.io.*;
 
     
 }
+

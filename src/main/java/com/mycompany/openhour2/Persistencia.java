@@ -2,19 +2,18 @@
 package com.mycompany.openhour2;
 
 import java.io.*;
-import java.util.ArrayList;
 import java.util.List;
 
 public class Persistencia {
-    public static void guardarUsuario(Usuario usuario, String archivo) throws IOException {
+    public static void guardarUsuarios(List<Usuario> usuarios, String archivo) throws IOException {
         try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(archivo))) {
-            oos.writeObject(usuario);
+            oos.writeObject(usuarios);
         }
     }
-        
-     public static Usuario cargarUsuario(String archivo) throws IOException, ClassNotFoundException {
+
+    public static List<Usuario> cargarUsuarios(String archivo) throws IOException, ClassNotFoundException {
         try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(archivo))) {
-            return (Usuario) ois.readObject();
+            return (List<Usuario>) ois.readObject();
         }
-}
+    }
 }
